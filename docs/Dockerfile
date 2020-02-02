@@ -13,11 +13,9 @@ RUN set -x \
 
 RUN pip install -r requirements.txt
 
-COPY . /app
+COPY . /docs
 
-ENV DATA_DIR=/app/docs
-
-WORKDIR $DATA_DIR
+WORKDIR /docs
 
 EXPOSE 8000
 
