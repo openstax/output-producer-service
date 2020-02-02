@@ -8,7 +8,11 @@ from app.middleware import DBSessionMiddleware
 server = FastAPI(title="COPS - Content Output Producer Service")
 
 # Add API endpoints
-server.include_router(api_router, prefix="/api")
+server.include_router(api_router,
+                      prefix="/api",
+                      openapi_url="/api/openapi.json",
+                      docs_url="/api/docs",
+                      redoc_url="/api/redoc")
 
 # CORS
 origins = []
@@ -26,6 +30,5 @@ if config.BACKEND_CORS_ORIGINS:
         allow_methods=["*"],
         allow_headers=["*"],
     ),
-
 
 server.add_middleware(DBSessionMiddleware)
