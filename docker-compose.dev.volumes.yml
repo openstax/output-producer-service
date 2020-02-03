@@ -5,4 +5,4 @@ services:
       - ./backend/app:/app
   docs:
     volumes:
-      - .:/app
+      - ./docs:/docs
