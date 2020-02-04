@@ -4,14 +4,17 @@
 Setting up local qa cops test environs (will be updated)
 ========================================================
 
+.. note::
+    These steps apply for OSX only
+
 Objective
----------
+=========
 
 Get familiar with Concourse by setting up the bakery-pipeline locally.
 This is the pipeline which is used under the hood for `Content Output Producer (COPS) <https://cops.openstax.org/>`_
 
 Retrieve Project & Config File
-------------------------------
+==============================
 
 1. Clone repository containing the pipeline configuration file to your local directory:
 
@@ -34,7 +37,7 @@ Retrieve Project & Config File
 You should see pipeline.yml listed. This file is used to configure the pipeline.
 
 Setup local concourse server
-----------------------------
+============================
 
 0. Prerequisites:
 
@@ -44,7 +47,15 @@ Setup local concourse server
 
 - `wget <https://www.gnu.org/software/wget/>`_
 
-Steps to install wget (as per INSTALL document in the directory):
+Steps to install wget:
+
+Run:
+
+.. code-block:: bash
+
+    $ brew install wget
+
+Or use steps in the INSTALL document:
 
 - download wget-1.20.3.tar.gz (or latest)
 
@@ -83,7 +94,7 @@ In the /bakery directory that contains your pipeline.yml, run:
    `localhost:8080 <localhost:8080>`_
 
 Setup pipeline with local Concourse and pipeline.yml
-----------------------------------------------------
+====================================================
 
 1. Target the Concourse UI, so you are able to set the pipelines to UI:
 
@@ -112,13 +123,13 @@ and login.
 for the pipeline to grab.
 
 Setting up local pipeline to monitor jobs on production cops (temporary solution)
----------------------------------------------------------------------------------
+=================================================================================
 
-1. in a terminal, run:
+1. in a terminal, cd into the cloned concourse-pipelines directory and
 
 .. code-block:: bash
 
-   cd .../Projects/concourse-pipelines/bakery
+   cd bakery
 
 2. in an editor, open pipeline.yml
 
@@ -156,22 +167,23 @@ Setting up local pipeline to monitor jobs on production cops (temporary solution
 
 .. code-block:: bash
 
-   fly -t local-pipeline-stuff set-pipeline -p pdf-producer -c pipeline.yml
+   fly -t local set-pipeline -p pdf-producer -c pipeline.yml
+where 'local' is an example naming and can be changed
 
 and if needed, run:
 
 .. code-block:: bash
 
-   fly -t local-pipeline-stuff unpause-pipeline -p pdf-producer
+   fly -t local unpause-pipeline -p pdf-producer
 
 6. if pipeline does not work, run:
 
 .. code-block:: bash
 
-   fly -t local-pipeline-stuff destroy-pipeline -p pdf-producer
+   fly -t local destroy-pipeline -p pdf-producer
 
 and then run:
 
 .. code-block:: bash
 
-   fly -t local-pipeline-stuff set-pipeline -p pdf-producer -c pipeline.yml
+   fly -t local set-pipeline -p pdf-producer -c pipeline.yml
