@@ -1,5 +1,5 @@
 const config = {
-  apiBaseURL: process.env.API_URL || 'https://cops.openstax.org',
-  browserBaseURL: process.env.API_URL_BROWSER || 'https://cops.openstax.org'
+  apiBaseURL: process.env.API_URL || '',
+  browserBaseURL: process.env.API_URL_BROWSER || ''
 }
 module.exports = config

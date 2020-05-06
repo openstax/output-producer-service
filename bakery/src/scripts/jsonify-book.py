@@ -7,13 +7,17 @@ book_dir, out_dir = sys.argv[1:3]
 
 files = [basename(x).rstrip(".xhtml") for x in glob(f"{book_dir}/*.xhtml")]
 
-json_data = {}
-
+print(f"Converting {len(files)} files to JSON")
 for path in files:
+    print(f"Converting {book_dir}/{path}.xhtml")
+    json_data = {}
     try:
         with open(f"{book_dir}/{path}-metadata.json", "r") as meta_part:
             json_data = json.load(meta_part)
     except FileNotFoundError:
+        json_data = {}
+    
+    if json_data is None:
         json_data = {}
 
     with open(f"{book_dir}/{path}.xhtml", "r") as book_part:

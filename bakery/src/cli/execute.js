@@ -1,12 +1,17 @@
 const path = require('path')
 const fs = require('fs')
-const { execFileSync, spawn } = require('child_process')
+const { execFileSync, spawn: fsSpawn } = require('child_process')
 const waitPort = require('wait-port')
 
 const tmp = require('tmp')
-tmp.setGracefulCleanup()
+// tmp.setGracefulCleanup()
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+const spawn = (program, args, options) => {
+  console.log(`spawining ${program} ${args.join(' ')}`)
+  return fsSpawn(program, args, options)
+}
 
 const completion = subprocess => {
   const error = new Error()
@@ -191,7 +196,7 @@ const flyExecute = async (cmdArgs, { image, persist }) => {
     }
     error = err
   } finally {
-    if (error != null || !persist) {
+    if (!persist) {
       console.log('cleaning up')
       const cleanUp = spawn('docker-compose', [
         '-f', tmpComposeYml.name,
