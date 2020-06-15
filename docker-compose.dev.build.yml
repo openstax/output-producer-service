@@ -5,7 +5,7 @@ services:
       context: ./backend
       dockerfile: backend.dockerfile
       args:
-        INSTALL_DEV: 'True'
+        INSTALL_DEV: 'true'
   frontend:
     build:
       context: ./frontend
