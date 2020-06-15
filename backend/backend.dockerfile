@@ -4,7 +4,6 @@ RUN apt-get update -qq \
  && apt-get install -y --no-install-recommends \
     # required by psycopg2 at build and runtime
     libpq-dev \
-     # required for health check
     curl \
  && apt-get autoremove -y
 
@@ -40,6 +39,9 @@ COPY --from=builder /opt/venv /opt/venv
 # make sure we use the virtualenv
 ENV PATH="/opt/venv/bin:$PATH"
 
+# add our app to the path
+ENV PYTHONPATH="/app:$PYTHONPATH"
+
 RUN curl https://raw.githubusercontent.com/vishnubob/wait-for-it/54d1f0bfeb6557adf8a3204455389d0901652242/wait-for-it.sh \
   -o /usr/local/bin/wait-for-it && chmod a+x /usr/local/bin/wait-for-it
 
@@ -51,12 +53,7 @@ COPY ./docker/gunicorn.conf /gunicorn.conf
 COPY ./app /app
 WORKDIR /app
 
-# update permissions & change user to not run as root
-RUN chgrp -R 0 /app && chmod -R g=u /app
-USER 1001
-
 EXPOSE 8888
 EXPOSE 80
 
 CMD ["/start.sh"]
-
