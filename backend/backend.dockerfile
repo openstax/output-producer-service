@@ -15,6 +15,11 @@ ENV POETRY_VERSION 1.0.5
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 ENV PATH "/root/.poetry/bin:/opt/venv/bin:${PATH}"
 
+# install wait-for-it
+# allows us to wait for specific services to be up before executing scripts
+RUN curl https://raw.githubusercontent.com/vishnubob/wait-for-it/54d1f0bfeb6557adf8a3204455389d0901652242/wait-for-it.sh \
+  -o /usr/local/bin/wait-for-it && chmod a+x /usr/local/bin/wait-for-it
+
 # copy files
 COPY ./app /build/
 
@@ -41,9 +46,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # add our app to the path
 ENV PYTHONPATH="/app:$PYTHONPATH"
-
-RUN curl https://raw.githubusercontent.com/vishnubob/wait-for-it/54d1f0bfeb6557adf8a3204455389d0901652242/wait-for-it.sh \
-  -o /usr/local/bin/wait-for-it && chmod a+x /usr/local/bin/wait-for-it
 
 COPY ./docker/start.sh /start.sh
 RUN chmod +x /start.sh
