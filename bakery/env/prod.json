@@ -2,10 +2,12 @@
   "ENV_NAME": "production",
   "COPS_TARGET": "https://cops.openstax.org/api",
   "S3_PDF_BUCKET": "ce-pdf-spike",
-  "S3_DIST_BUCKET": "ce-contents-cops-distribution-373045849756",
-  "S3_QUEUE_STATE_BUCKET": "",
-  "QUEUE_FILENAME": "",
+  "S3_DIST_BUCKET": "web-hosting-content-gatekeeper",
+  "S3_QUEUE_STATE_BUCKET": "web-hosting-content-queue-state",
+  "QUEUE_FILENAME": "distribution-queue.json",
   "FEED_FILE_URL": "https://raw.githubusercontent.com/openstax/content-manager-approved-books/master/approved-books.json",
-  "PIPELINE_TICK_INTERVAL": "",
-  "MAX_BOOKS_PER_TICK": ""
+  "PIPELINE_TICK_INTERVAL": "24h",
+  "MAX_BOOKS_PER_TICK": "50",
+  "DIST_BUCKET_AKI_SECRET_NAME": "((prod-web-hosting-content-gatekeeper-access-key-id))",
+  "DIST_BUCKET_SAK_SECRET_NAME": "((prod-web-hosting-content-gatekeeper-secret-access-key))"
 }

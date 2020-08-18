@@ -3,7 +3,7 @@
   "version": "0.0.4",
   "scripts": {
     "lint": "standard ./src/**/**.js",
-    "test": "ava -v --timeout=15m",
+    "test": "ava -v --timeout=15m -c 2",
     "package": "mkdir -p dist && cd dist && npm pack ../"
   },
   "dependencies": {

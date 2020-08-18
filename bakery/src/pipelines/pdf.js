@@ -63,12 +63,8 @@ const pipeline = (env) => {
       type: 's3',
       source: {
         bucket: env.S3_PDF_BUCKET,
-        access_key_id: env.ENV_NAME === 'local'
-          ? env.S3_ACCESS_KEY_ID
-          : '((aws-sandbox-secret-key-id))',
-        secret_access_key: env.ENV_NAME === 'local'
-          ? env.S3_SECRET_ACCESS_KEY
-          : '((aws-sandbox-secret-access-key))',
+        access_key_id: env.S3_ACCESS_KEY_ID,
+        secret_access_key: env.S3_SECRET_ACCESS_KEY,
         skip_download: true
       }
     }

@@ -7,5 +7,7 @@
   "QUEUE_FILENAME": "distribution-queue.json",
   "FEED_FILE_URL": "https://raw.githubusercontent.com/openstax/content-manager-approved-books/master/approved-books.json",
   "PIPELINE_TICK_INTERVAL": "24h",
-  "MAX_BOOKS_PER_TICK": "50"
+  "MAX_BOOKS_PER_TICK": "50",
+  "DIST_BUCKET_AKI_SECRET_NAME": "((aws-sandbox-secret-key-id))",
+  "DIST_BUCKET_SAK_SECRET_NAME": "((aws-sandbox-secret-access-key))"
 }

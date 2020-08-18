@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
+set -eo pipefail
 dir=$(dirname "$0")
 CALLER=$0 node "${dir}/build.js" "$@"

@@ -16,11 +16,14 @@ const completion = subprocess => {
     subprocess.stderr.on('data', data => {
       stderr += data.toString()
     })
-    subprocess.on('exit', code => {
+    subprocess.on('error', err => {
+      reject(err)
+    })
+    subprocess.on('exit', (code, signal) => {
       if (code === 0) {
         resolve({ stdout, stderr })
       } else {
-        error.message = `Subprocess failed with code ${code} and captured output: \n${formatSubprocessOutput({ stdout, stderr })}`
+        error.message = `Subprocess failed with code ${code}, signal ${signal}, and captured output: \n${formatSubprocessOutput({ stdout, stderr })}`
         reject(error)
       }
     })
@@ -54,6 +57,24 @@ const sourceObjs = (obj) => {
   return sources
 }
 
+const allParam = (obj, param) => {
+  const values = []
+  if (typeof obj !== 'object') { return values }
+  if (obj instanceof Array) {
+    for (const subobj of obj) {
+      values.push(...allParam(subobj, param))
+    }
+  }
+  if (obj[param] != null) {
+    values.push(obj[param])
+  } else {
+    for (const key of Object.keys(obj)) {
+      values.push(...allParam(obj[key], param))
+    }
+  }
+  return values
+}
+
 test('build pipelines', async t => {
   const envs = (await fs.readdir('env')).map(file => path.basename(file, '.json'))
   const pipelines = (await fs.readdir('src/pipelines')).map(file => path.basename(file, '.js'))
@@ -69,13 +90,13 @@ test('build pipelines', async t => {
         ],
         {
           // Include credentials in environment for local pipelines
-          env: env === 'local' ? {
+          env: {
             ...process.env,
             ...{
               AWS_ACCESS_KEY_ID: 'accesskey',
               AWS_SECRET_ACCESS_KEY: 'secret'
             }
-          } : process.env
+          }
         }
         ))
       )
@@ -90,17 +111,63 @@ test('local pipelines error without credentials', async t => {
   const pipelines = (await fs.readdir('src/pipelines')).map(file => path.basename(file, '.js'))
 
   for (const pipeline of pipelines) {
-    const subproc = completion(spawn('./build', [
-      'pipeline',
-      pipeline,
-      'local'
-    ]
-    ))
+    const subproc = async () => {
+        await completion(spawn('./build', [
+        'pipeline',
+        pipeline,
+        'local'
+      ]))
+    }
 
     await t.throwsAsync(
       subproc,
       { message: /Please set AWS_ACCESS_KEY_ID in your environment/ }
     )
+  }
+})
+
+test('staging and prod secret names differ', async t => {
+  const pipelines = (await fs.readdir('src/pipelines')).map(file => path.basename(file, '.js'))
+
+  for (const pipeline of ['distribution', 'gdoc']) {
+    let stagingOut = ''
+    const stagingPipeline = spawn('./build', [
+      'pipeline',
+      pipeline,
+      'staging'
+    ])
+    stagingPipeline.stdout.on('data', (data) => {
+      stagingOut += data.toString()
+    })
+    const stagingResults = await completion(stagingPipeline)
+    const stagingOutObj = yaml.safeLoad(stagingOut)
+    const stagingAkiSet = new Set(allParam(stagingOutObj, 'AWS_ACCESS_KEY_ID'))
+    const stagingSakSet = new Set(allParam(stagingOutObj, 'AWS_SECRET_ACCESS_KEY'))
+    if (stagingAkiSet.size === 0) {
+      console.error(stagingResults.stderr)
+      console.error(stagingResults.stdout)
+    }
+    t.is(stagingAkiSet.size, 1, pipeline + ' staging: ' + JSON.stringify([...stagingAkiSet]))
+    t.is(stagingSakSet.size, 1, pipeline + ' staging: ' + JSON.stringify([...stagingSakSet]))
+
+    let prodOut = ''
+    const prodPipeline = spawn('./build', [
+      'pipeline',
+      pipeline,
+      'prod'
+    ])
+    prodPipeline.stdout.on('data', (data) => {
+      prodOut += data.toString()
+    })
+    await completion(prodPipeline)
+    const prodOutObj = yaml.safeLoad(prodOut)
+    const prodAkiSet = new Set(allParam(prodOutObj, 'AWS_ACCESS_KEY_ID'))
+    const prodSakSet = new Set(allParam(prodOutObj, 'AWS_SECRET_ACCESS_KEY'))
+    t.is(prodAkiSet.size, 1, pipeline + ' prod: ' + JSON.stringify([...prodAkiSet]))
+    t.is(prodSakSet.size, 1, pipeline + ' prod: ' + JSON.stringify([...prodSakSet]))
+
+    t.not([...stagingAkiSet][0], [...prodAkiSet][0])
+    t.not([...stagingSakSet][0], [...prodSakSet][0])
   }
 })
 
@@ -118,6 +185,7 @@ test('default tag is trunk', async t => {
 
   const obj = yaml.safeLoad(pipelineOut)
   const sources = sourceObjs(obj)
+  
   for (const source of sources) {
     t.is(source.tag, 'trunk', formatSubprocessOutput(buildPipelineResult))
   }
@@ -139,12 +207,15 @@ test('pin pipeline tasks to versions', async t => {
 
   const obj = yaml.safeLoad(pipelineOut)
   const sources = sourceObjs(obj)
+  if (sources.length === 0) {
+    console.log(buildPipelineResult.stdout)
+  }
   for (const source of sources) {
     t.is(source.tag, customTag, formatSubprocessOutput(buildPipelineResult))
   }
 })
 
-test('stable flow in pdf and distribution pipeline', async t => {
+test.skip('stable flow in pdf and distribution pipeline', async t => {
   // Prepare test data
   const bookId = 'col30149'
   const outputDir = 'src/tests/output'

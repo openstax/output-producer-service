@@ -1,3 +1,4 @@
+console.error('elmo')
 require('yargs')
   .command(require('./src/pipeline'))
   .command(require('./src/task'))
@@ -7,9 +8,12 @@ require('yargs')
   .version(false)
   .strict()
   .fail((msg, err, yargs) => {
+    console.log('elmofail')
     if (err) throw err
     console.error(yargs.help())
     console.error(`\nError: ${msg}`)
-    process.exit(1)
+    process.exit(2)
   })
   .argv
+
+console.error('elmo2')

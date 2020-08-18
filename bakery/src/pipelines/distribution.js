@@ -13,8 +13,10 @@ const pipeline = (env) => {
   const taskUploadBook = require('../tasks/upload-book')
   const taskValidateXhtml = require('../tasks/validate-xhtml')
 
-  const awsAccessKeyId = env.ENV_NAME === 'local' ? env.S3_ACCESS_KEY_ID : '((aws-sandbox-secret-key-id))'
-  const awsSecretAccessKey = env.ENV_NAME === 'local' ? env.S3_SECRET_ACCESS_KEY : '((aws-sandbox-secret-access-key))'
+  console.error('elmodist')
+
+  const awsAccessKeyId = env.S3_ACCESS_KEY_ID
+  const awsSecretAccessKey = env.S3_SECRET_ACCESS_KEY
   const codeVersionFromTag = env.IMAGE_TAG || 'version-unknown'
   const queueFilename = `${codeVersionFromTag}.${env.QUEUE_FILENAME}`
 
@@ -66,6 +68,8 @@ const pipeline = (env) => {
     ]
   }
 
+  console.error('elmodist2')
+
   const bakeryJob = {
     name: 'bakery',
     max_in_flight: 5,
@@ -104,7 +108,7 @@ const pipeline = (env) => {
       })
     ]
   }
-
+  console.error('elmodist3')
   return {
     config: {
       resources: resources,

@@ -13,8 +13,8 @@ const pipeline = (env) => {
   const taskGdocifyBook = require('../tasks/gdocify-book')
   const taskConvertDocx = require('../tasks/convert-docx')
 
-  const awsAccessKeyId = env.ENV_NAME === 'local' ? env.S3_ACCESS_KEY_ID : '((aws-sandbox-secret-key-id))'
-  const awsSecretAccessKey = env.ENV_NAME === 'local' ? env.S3_SECRET_ACCESS_KEY : '((aws-sandbox-secret-access-key))'
+  const awsAccessKeyId = env.S3_ACCESS_KEY_ID
+  const awsSecretAccessKey = env.S3_SECRET_ACCESS_KEY
   const codeVersionFromTag = env.IMAGE_TAG || 'version-unknown'
   const queueFilename = `${codeVersionFromTag}.${env.QUEUE_FILENAME}`
 
